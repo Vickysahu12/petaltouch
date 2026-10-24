@@ -40,20 +40,20 @@ function Search({ onPick, onClose }) {
 
   return (
     <motion.div
-      className="absolute right-0 top-[calc(100%+14px)] w-[min(92vw,380px)] origin-top-right rounded-2xl border border-line bg-bg p-3 shadow-[0_20px_50px_-20px_rgb(0_0_0/0.25)]"
+      className="fixed inset-x-3 top-[76px] origin-top rounded-2xl border border-line bg-bg p-3 md:absolute md:inset-x-auto md:right-0 md:top-[calc(100%+14px)] md:w-[380px] md:origin-top-right shadow-[0_20px_50px_-20px_rgb(0_0_0/0.25)]"
       initial={{ opacity: 0, scale: 0.96, y: -4 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.97, transition: { duration: 0.12 } }}
       transition={{ duration: 0.18, ease: EASE_OUT }}
     >
-      <label className="flex h-10 items-center gap-2 rounded-full border border-line px-3.5 focus-within:border-ink">
+      <label className="flex h-10 items-center gap-2 rounded-full border border-line px-3.5 transition-colors focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/15">
         <MagnifyingGlass size={16} className="text-muted" />
         <input
           ref={inputRef}
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Search sunflowers, lilies, nazar..."
-          className="h-full flex-1 bg-transparent text-sm outline-none placeholder:text-muted"
+          className="h-full flex-1 bg-transparent text-sm outline-none placeholder:text-muted focus-visible:outline-none"
           aria-label="Search products"
         />
       </label>
@@ -135,7 +135,7 @@ export default function Nav() {
             <div className="flex items-center gap-1.5">
               <a href="#top" onClick={(e) => go(e, '#top')} className="press mr-1 flex items-center gap-2" aria-label="Petal Touch home">
                 <img src={BRAND.logo} alt="" className="size-10 rounded-full ring-1 ring-line" />
-                <span className="font-wide hidden text-[13px] font-semibold uppercase tracking-wide sm:block xl:hidden">Petal Touch</span>
+                <span className="font-wide hidden text-[13px] font-semibold uppercase tracking-wide sm:block md:hidden">Petal Touch</span>
               </a>
               {[
                 { href: `https://wa.me/${BRAND.whatsapp}`, icon: WhatsappLogo, label: 'WhatsApp' },
@@ -147,14 +147,14 @@ export default function Nav() {
                   target="_blank"
                   rel="noreferrer"
                   aria-label={s.label}
-                  className="press hidden size-8 place-items-center rounded-full bg-[#ff8fb8] text-white transition-transform hover:-rotate-12 hover:bg-accent xl:grid"
+                  className="press hidden size-8 place-items-center rounded-full bg-[#ff8fb8] text-white transition-transform hover:-rotate-12 hover:bg-accent md:grid"
                 >
                   <s.icon size={16} weight="fill" />
                 </a>
               ))}
             </div>
 
-            <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
+            <nav className="ml-auto mr-3 hidden items-center gap-0.5 lg:flex" aria-label="Main">
               {NAV_LINKS.map((l) => (
                 <a
                   key={l.href}

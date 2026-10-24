@@ -25,16 +25,16 @@ export default function Shop() {
   return (
     <section id="shop" className="mx-auto max-w-[1280px] px-4 pb-20 md:px-10 md:pb-28">
       <div className="flex items-center justify-between gap-4">
-        <h2 className="font-display text-[clamp(1.9rem,3.2vw,2.75rem)] leading-tight">
-          <LineReveal text="Choose Our Best Bouquet" />
+        <h2 className="font-wide text-[clamp(1.9rem,4.2vw,3.5rem)] font-medium leading-none tracking-[-0.03em]">
+          <LineReveal text="Catalogue" />
         </h2>
-        <Button size="sm" onClick={() => setAll((a) => !a)}>
+        <Button size="md" onClick={() => setAll((a) => !a)}>
           {all ? 'Show Less' : 'View All'}
         </Button>
       </div>
 
       <div className="-mx-4 mt-6 overflow-x-auto px-4 [scrollbar-width:none] md:mx-0 md:px-0" role="tablist" aria-label="Filter by flower">
-        <div className="flex gap-1 md:gap-6">
+        <div className="flex gap-1 md:gap-2">
           {categories.map((c) => {
             const active = !all && c.id === cat
             return (
@@ -46,9 +46,9 @@ export default function Shop() {
                   setCat(c.id)
                   setAll(false)
                 }}
-                className={`press relative whitespace-nowrap px-5 py-1.5 text-sm transition-colors duration-200 ${active ? 'font-medium text-ink' : 'text-muted hover:text-ink'}`}
+                className={`press relative whitespace-nowrap rounded-full px-5 py-2 text-sm transition-colors duration-200 ${active ? 'font-medium text-accent-ink' : 'text-muted hover:text-ink'}`}
               >
-                {active && <motion.span layoutId="tab-box" className="absolute inset-0 bg-surface" transition={{ type: 'spring', duration: 0.45, bounce: 0.12 }} />}
+                {active && <motion.span layoutId="tab-box" className="absolute inset-0 rounded-full bg-accent" transition={{ type: 'spring', duration: 0.45, bounce: 0.15 }} />}
                 <span className="relative">{c.label}</span>
               </button>
             )
@@ -57,7 +57,7 @@ export default function Shop() {
       </div>
 
       <LayoutGroup>
-        <motion.ul layout className="mt-6 grid grid-cols-2 gap-x-3 gap-y-8 md:gap-x-5 lg:grid-cols-4">
+        <motion.ul layout className="mt-8 grid grid-cols-2 gap-x-3 gap-y-8 md:gap-x-5 md:gap-y-10 lg:grid-cols-4">
           <AnimatePresence mode="popLayout" initial={false}>
             {visible.map((p, i) => (
               <motion.li
@@ -149,36 +149,72 @@ export function AddControl({ product, imgRef, size = 'sm' }) {
   )
 }
 
+/** Corner bag button on each tile: a "+" that grows into a small stepper once the item is in the bag. */
+function TileAdd({ product, imgRef }) {
+  const { items, add, setQty } = useCart()
+  const qty = items[product.id] || 0
+  return (
+    <motion.div
+      layout
+      className="absolute bottom-3 right-3 z-10 flex h-10 items-center overflow-hidden rounded-full bg-accent text-accent-ink shadow-[0_10px_24px_-8px_rgb(210_58_119/0.7)]"
+      transition={{ type: 'spring', duration: 0.4, bounce: 0.2 }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <AnimatePresence initial={false} mode="popLayout">
+        {qty > 0 && (
+          <motion.span key="minus" className="flex items-center" initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 8 }}>
+            <button onClick={() => setQty(product.id, qty - 1)} className="press grid size-10 place-items-center hover:bg-black/10" aria-label={`Remove one ${product.name}`}>
+              <Minus size={14} weight="bold" />
+            </button>
+            <span className="w-4 text-center text-sm font-semibold tabular-nums">{qty}</span>
+          </motion.span>
+        )}
+      </AnimatePresence>
+      <button
+        onClick={() => add(product, imgRef.current)}
+        className="press grid size-10 place-items-center hover:bg-black/10"
+        aria-label={qty ? `Add one more ${product.name}` : `Add ${product.name} to bag`}
+      >
+        <Plus size={16} weight="bold" />
+      </button>
+    </motion.div>
+  )
+}
+
 function ProductCard({ product, onQuickView }) {
   const imgRef = useRef(null)
+  const src = product.cutout || product.image
   return (
-    <article className="group">
-      <motion.button
-        layoutId={`img-${product.id}`}
-        onClick={onQuickView}
-        className="relative block aspect-[105/100] w-full overflow-hidden bg-surface"
-        aria-label={`Quick view ${product.name}`}
-        transition={{ type: 'spring', duration: 0.55, bounce: 0.1 }}
-      >
-        <img
-          ref={imgRef}
-          src={product.image}
-          alt={product.name}
-          loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-[900ms] ease-[var(--ease-out-strong)] [@media(hover:hover)]:group-hover:scale-[1.06]"
-        />
-        <span className="pointer-events-none absolute inset-x-0 bottom-0 hidden translate-y-full items-center justify-center gap-1.5 bg-ink/85 py-2.5 text-xs font-medium tracking-wide text-bg transition-transform duration-300 ease-[var(--ease-out-strong)] [@media(hover:hover)]:flex group-hover:translate-y-0">
-          <Eye size={14} /> Quick View
-        </span>
-      </motion.button>
-      <p className="mt-3 truncate text-[13px] md:text-sm">
-        <span className="font-medium">{product.name}</span>
-        <span className="text-muted"> ({product.detail})</span>
-      </p>
-      <div className="mt-2 flex items-center justify-between gap-2">
-        <span className="text-[17px] font-bold tabular-nums md:text-lg">{formatINR(product.price)}</span>
-        <AddControl product={product} imgRef={imgRef} />
+    <article className="group text-center">
+      <div className="relative">
+        <motion.button
+          layoutId={`img-${product.id}`}
+          onClick={onQuickView}
+          className="relative block aspect-[141/178] w-full overflow-hidden bg-surface"
+          aria-label={`Quick view ${product.name}`}
+          transition={{ type: 'spring', duration: 0.55, bounce: 0.1 }}
+        >
+          <span className="absolute inset-x-[12%] bottom-[8%] h-[10%] rounded-[50%] bg-accent/10 blur-md transition-transform duration-500 group-hover:scale-x-90" />
+          <img
+            ref={imgRef}
+            src={src}
+            alt={product.name}
+            loading="lazy"
+            className={`relative h-full w-full transition-transform duration-[700ms] ease-[var(--ease-out-strong)] [@media(hover:hover)]:group-hover:-translate-y-2 [@media(hover:hover)]:group-hover:-rotate-2 [@media(hover:hover)]:group-hover:scale-[1.04] ${
+              product.cutout ? 'object-contain p-[9%] drop-shadow-[0_16px_18px_rgb(150_40_90/0.18)]' : 'object-cover'
+            }`}
+          />
+          <span className="pointer-events-none absolute left-3 top-3 hidden items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-medium text-ink opacity-0 transition-opacity duration-300 [@media(hover:hover)]:flex group-hover:opacity-100">
+            <Eye size={12} /> Quick view
+          </span>
+        </motion.button>
+        <TileAdd product={product} imgRef={imgRef} />
       </div>
+      <h3 className="font-wide mt-3 truncate text-[13px] font-medium md:text-[15px]">{product.name}</h3>
+      <p className="mt-1 text-[13px] text-muted">
+        <span className="font-semibold text-ink tabular-nums">{formatINR(product.price)}</span>
+        <span className="hidden sm:inline"> · {product.detail}</span>
+      </p>
     </article>
   )
 }
@@ -227,7 +263,12 @@ function QuickViewPanel({ product, onClose }) {
           className="relative aspect-square overflow-hidden bg-surface md:aspect-auto md:min-h-[520px]"
           transition={{ type: 'spring', duration: 0.55, bounce: 0.1 }}
         >
-          <img ref={imgRef} src={product.image} alt={product.name} className="absolute inset-0 h-full w-full object-cover" />
+          <img
+            ref={imgRef}
+            src={product.cutout || product.image}
+            alt={product.name}
+            className={`absolute inset-0 h-full w-full ${product.cutout ? 'object-contain p-[10%] drop-shadow-[0_20px_24px_rgb(150_40_90/0.2)]' : 'object-cover'}`}
+          />
         </motion.div>
         <div className="flex flex-col p-6 md:p-9">
           <button onClick={onClose} className="press ml-auto grid size-9 place-items-center bg-surface hover:bg-surface-2" aria-label="Close quick view">

@@ -2,8 +2,6 @@ import { useRef } from 'react'
 import { motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion'
 import { Truck, Flower, HandHeart, Gift, ArrowRight } from '@phosphor-icons/react'
 import heroBouquet from '../assets/cutouts/hero-bouquet-clean.webp'
-import nazarHand from '../assets/cutouts/nazar-hand.webp'
-import sunflowerHand from '../assets/cutouts/sunflower-hand.webp'
 import { Button, EASE_OUT, EASE_IN_OUT, Magnetic, Reveal } from './ui'
 import { FloatingBlossom } from './Blossom'
 import { useScrollTo } from './Nav'
@@ -20,24 +18,35 @@ const BLOOMS = [
   { tone: 'white', size: 58, className: 'right-[4%] bottom-[30%] hidden md:block', depth: 0.6, delay: 1.4 },
 ]
 
+// Each cloud is a cluster of soft puffs: [left%, top%, width%] for the cluster, then puffs inside it
+const CLOUDS = [
+  { at: [-4, 6, 34], puffs: [[0, 30, 46], [24, 0, 52], [52, 22, 44]], drift: 40 },
+  { at: [66, 14, 38], puffs: [[0, 24, 42], [26, 0, 50], [56, 28, 42]], drift: -50 },
+  { at: [6, 52, 30], puffs: [[0, 20, 50], [30, 0, 56], [60, 30, 40]], drift: 30 },
+  { at: [70, 58, 34], puffs: [[0, 30, 44], [28, 0, 54], [58, 24, 42]], drift: -36 },
+  { at: [28, 80, 46], puffs: [[0, 20, 40], [22, 0, 48], [52, 14, 46]], drift: 24 },
+]
+
 function Clouds() {
   const reduce = useReducedMotion()
-  const clouds = [
-    'left-[-6%] top-[8%] h-28 w-[42%]',
-    'right-[-8%] top-[26%] h-24 w-[38%]',
-    'left-[18%] top-[58%] h-20 w-[30%]',
-    'right-[10%] bottom-[6%] h-28 w-[40%]',
-    'left-[-10%] bottom-[14%] h-24 w-[34%]',
-  ]
   return (
     <div aria-hidden className="absolute inset-0">
-      {clouds.map((c, i) => (
-        <motion.span
-          key={c}
-          className={`absolute rounded-[50%] bg-white/70 blur-2xl ${c}`}
-          animate={reduce ? undefined : { x: [0, i % 2 ? -40 : 40, 0] }}
-          transition={{ duration: 18 + i * 4, repeat: Infinity, ease: 'easeInOut' }}
-        />
+      {CLOUDS.map((c, i) => (
+        <motion.div
+          key={i}
+          className="absolute aspect-[3/1]"
+          style={{ left: `${c.at[0]}%`, top: `${c.at[1]}%`, width: `${c.at[2]}%` }}
+          animate={reduce ? undefined : { x: [0, c.drift, 0] }}
+          transition={{ duration: 26 + i * 5, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          {c.puffs.map(([l, t, w], j) => (
+            <span
+              key={j}
+              className="absolute aspect-square rounded-full bg-white/80 blur-2xl"
+              style={{ left: `${l}%`, top: `${t}%`, width: `${w}%` }}
+            />
+          ))}
+        </motion.div>
       ))}
     </div>
   )
@@ -49,7 +58,7 @@ export default function Hero() {
   const scrollTo = useScrollTo()
   const { scrollY } = useScroll()
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
-  const bouquetY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : 120])
+  const bouquetY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : 90])
   const titleY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : 220])
   const titleScale = useTransform(scrollYProgress, [0, 1], [1, reduce ? 1 : 0.92])
   const bloomScroll = useTransform(scrollY, (v) => (reduce ? 0 : v * 0.25))
@@ -60,9 +69,6 @@ export default function Hero() {
   const mx = useSpring(rawX, { stiffness: 50, damping: 16 })
   const my = useSpring(rawY, { stiffness: 50, damping: 16 })
   const tilt = useTransform(mx, [-20, 20], [-3, 3])
-  const tiltLeft = useTransform(mx, [-20, 20], [-9, -3])
-  const tiltRight = useTransform(mx, [-20, 20], [-3, -9])
-  const sideY = useTransform(scrollYProgress, [0, 1], [0, reduce ? 0 : 200])
   const onMove = (e) => {
     if (reduce || e.pointerType !== 'mouse') return
     const r = ref.current.getBoundingClientRect()
@@ -71,18 +77,18 @@ export default function Hero() {
   }
 
   return (
-    <section id="top" className="p-2.5 md:p-5">
+    <section id="top" className="md:p-5">
       <div
         ref={ref}
         onPointerMove={onMove}
-        className="relative isolate min-h-[640px] overflow-hidden rounded-[28px] md:h-[calc(100dvh-40px)] md:min-h-[680px] md:rounded-[36px]"
+        className="relative isolate h-[100svh] min-h-[620px] overflow-hidden rounded-b-[28px] md:h-[calc(100dvh-40px)] md:min-h-[680px] md:rounded-[36px]"
         style={{ background: 'linear-gradient(180deg, #8fbdf0 0%, #b6d5f6 42%, #dcebfb 78%, #f3f8fe 100%)' }}
       >
         <Clouds />
 
         <motion.h1
           style={{ y: titleY, scale: titleScale }}
-          className="font-wide absolute inset-x-0 top-[104px] z-10 whitespace-nowrap text-center text-[9.6vw] font-extrabold leading-none tracking-[-0.03em] text-white md:top-[14%] md:text-[clamp(4rem,9.6vw,9.25rem)] [text-shadow:0_2px_0_rgb(120_160_215/0.35),0_10px_40px_rgb(50_100_170/0.35)]"
+          className="font-wide absolute inset-x-0 top-[104px] z-10 whitespace-nowrap text-center text-[9.6vw] font-extrabold leading-none tracking-[-0.03em] text-white md:top-[15%] md:text-[clamp(3.75rem,7.6vw,7.75rem)] [text-shadow:0_2px_0_rgb(120_160_215/0.35),0_10px_40px_rgb(50_100_170/0.35)]"
           aria-label="Petal Touch"
         >
           {TITLE.split('').map((ch, i) => (
@@ -112,38 +118,12 @@ export default function Hero() {
           <FloatingBlossom key={i} {...b} scroll={bloomScroll} mx={mx} my={my} />
         ))}
 
-        {/* Side hands rise a beat after the centre bouquet and sway the other way */}
-        <motion.div style={{ y: sideY }} className="absolute bottom-[-12%] left-[-1%] z-[15] hidden md:block md:w-[20%] xl:left-[24%] xl:w-[14%]">
-          <motion.img
-            src={nazarHand}
-            alt="Hand holding the blue nazar bouquet"
-            style={{ rotate: tiltLeft }}
-            className="w-full origin-bottom object-contain drop-shadow-[0_24px_30px_rgba(60,90,140,0.25)]"
-            initial={reduce ? { opacity: 0 } : { opacity: 0, y: 220 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ type: 'spring', duration: 1.5, bounce: 0.2, delay: 0.75 }}
-          />
-        </motion.div>
-        <motion.div style={{ y: sideY }} className="absolute bottom-0 right-[2%] z-[15] hidden md:block md:w-[17%] xl:right-[23%] xl:w-[13%]">
-          <div className="-scale-x-100">
-          <motion.img
-            src={sunflowerHand}
-            alt="Hand holding a single sunflower"
-            style={{ rotate: tiltRight }}
-            className="w-full origin-bottom object-contain drop-shadow-[0_24px_30px_rgba(60,90,140,0.25)]"
-            initial={reduce ? { opacity: 0 } : { opacity: 0, y: 220 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ type: 'spring', duration: 1.5, bounce: 0.2, delay: 0.9 }}
-          />
-          </div>
-        </motion.div>
-
-        <motion.div style={{ y: bouquetY }} className="absolute inset-x-0 bottom-0 z-20 flex justify-center">
+        <motion.div style={{ y: bouquetY }} className="pointer-events-none absolute inset-0 z-20 flex items-end justify-center">
           <motion.img
             src={heroBouquet}
             alt="Pink lily and tulip chenille bouquet"
             style={{ rotate: tilt }}
-            className="h-[48svh] max-h-[460px] w-auto origin-bottom object-contain drop-shadow-[0_30px_40px_rgba(60,90,140,0.3)] md:h-[62%] md:max-h-[640px]"
+            className="h-[64svh] max-h-[620px] w-auto origin-bottom object-contain drop-shadow-[0_30px_40px_rgba(60,90,140,0.3)] md:h-[74%] md:max-h-none"
             initial={reduce ? { opacity: 0 } : { opacity: 0, y: 180, scale: 0.92 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ type: 'spring', duration: 1.4, bounce: 0.22, delay: 0.45 }}
@@ -151,7 +131,7 @@ export default function Hero() {
           />
         </motion.div>
 
-        <div className="absolute inset-x-0 bottom-0 z-30 flex flex-col gap-4 p-4 md:flex-row md:items-end md:justify-between md:p-9">
+        <div className="absolute inset-x-0 bottom-0 z-30 flex flex-col gap-4 p-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] md:flex-row md:items-end md:justify-between md:p-9">
           <motion.div
             className="hidden max-w-[25ch] text-[#1d3557] xl:block"
             initial={{ opacity: 0, y: 16 }}
@@ -183,7 +163,7 @@ export default function Hero() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-[1280px] px-2 md:px-5">
+      <div className="mx-auto max-w-[1280px] px-4 md:px-5">
         <BrandStrip />
         <Perks />
       </div>

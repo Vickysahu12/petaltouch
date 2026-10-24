@@ -38,6 +38,10 @@ export const images = {
 }
 
 // Prices are sample values for the demo. Confirm with Sonu before launch.
+// Background-free versions of each product photo, shown on blush tiles in the catalogue
+const cutouts = import.meta.glob('../assets/products/*.webp', { eager: true, import: 'default' })
+const cutoutFor = (id) => cutouts[`../assets/products/${id}.webp`]
+
 export const products = [
   {
     id: 'sunflower-dusk',
@@ -158,5 +162,7 @@ export const categories = [
   { id: 'nazar', label: 'Nazar' },
   { id: 'singles', label: 'Single Stems' },
 ]
+
+for (const p of products) p.cutout = cutoutFor(p.id)
 
 export const formatINR = (n) => '₹' + n.toLocaleString('en-IN')
