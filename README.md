@@ -1,16 +1,25 @@
-# React + Vite
+# Petal Touch by Sonu
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Demo storefront for [@petal_touch25](https://instagram.com/petal_touch25), handmade chenille bouquets from Surat.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React 19 + Vite, Tailwind CSS v4
+- Framer Motion for all animation, Lenis for smooth scrolling
+- Phosphor icons, Bodoni Moda (display) + Geist (body), self-hosted via Fontsource
 
-## React Compiler
+## Run
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm install
+npm run dev
+```
 
-## Expanding the Oxlint configuration
+## Where things live
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+- `src/data/products.js`: catalogue, prices, brand contact details. **Prices are sample values.**
+- `src/lib/cart.jsx`: cart state (saved in localStorage) and the WhatsApp order message
+- `src/components/`: one file per page section, plus `Cart.jsx` (drawer, fly-to-bag, toast) and `ui.jsx` (shared motion helpers)
+- `src/assets/ig/`: product photos taken from the brand's Instagram
+
+Checkout currently hands the order to WhatsApp (`wa.me`) with the bag contents pre-filled. Swap `orderMessage` / the drawer footer when a payment flow is chosen.

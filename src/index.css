@@ -1,1 +1,91 @@
 @import "tailwindcss";
+@import "@fontsource-variable/bodoni-moda/opsz.css";
+@import "@fontsource-variable/bodoni-moda/opsz-italic.css";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/unbounded";
+@import "lenis/dist/lenis.css";
+
+/* White page, blush tiles and one brand-pink accent (pulled from the Petal Touch logo) */
+:root {
+  --bg: #ffffff;
+  --surface: #fdf0f4;
+  --surface-2: #fae1ea;
+  --ink: #1e1418;
+  --muted: #6b5a60;
+  --line: #f0dbe3;
+  --accent: #d23a77;
+  --accent-hover: #b82d65;
+  --accent-ink: #ffffff;
+  --blush: #ffd3e2;
+  --sky: #a9cdf2;
+  color-scheme: light;
+}
+
+@theme {
+  --font-display: "Bodoni Moda Variable", "Bodoni 72", Didot, serif;
+  --font-wide: "Unbounded Variable", "Geist Variable", sans-serif;
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-ink: var(--accent-ink);
+  --color-blush: var(--blush);
+
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+html {
+  background: var(--bg);
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--blush);
+  color: var(--ink);
+}
+
+.font-display {
+  font-optical-sizing: auto;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Pressable feedback, shared by every button-like element */
+.press {
+  transition: transform 160ms var(--ease-out-strong), background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+}
+.press:active {
+  transform: scale(0.97);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
